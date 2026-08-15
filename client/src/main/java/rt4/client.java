@@ -17,6 +17,8 @@ import java.util.Random;
 @OriginalClass("client!client")
 public final class client extends GameShell {
 
+	public static boolean pendingFullscreen = false;
+
 	@OriginalMember(owner = "client!dk", name = "j", descriptor = "[Lclient!en;")
 	public static final BufferedFile[] cacheIndexes = new BufferedFile[28];
 	@OriginalMember(owner = "client!wa", name = "Eb", descriptor = "[Lclient!bg;")
@@ -1571,8 +1573,20 @@ public final class client extends GameShell {
 				Preferences.buildArea = 0;
 			}
 			Preferences.safeMode = true;
+
+			int mode = Preferences.favoriteWorlds;
+
+			// Start in HD windowed if requested — do NOT use mode 3 here
+			if (GlobalJsonConfig.instance != null && GlobalJsonConfig.instance.startFullscreen) {
+				mode = 1;
+				Preferences.favoriteWorlds = 1;
+				Preferences.windowMode = 1;
+				client.pendingFullscreen = true; // defer real fullscreen
+			}
+
 			Preferences.write(GameShell.signLink);
-			DisplayMode.setWindowMode(false, Preferences.favoriteWorlds, -1, -1);
+			DisplayMode.setWindowMode(false, mode, -1, -1);
+
 			mainLoadPercentage = 100;
 			mainLoadState = 160;
 			mainLoadSecondaryText = LocalizedText.MAINLOAD150B;
@@ -1588,6 +1602,7 @@ public final class client extends GameShell {
 			return;
 		}
 		loop++;
+
 		if (loop % 1000 == 1) {
 			@Pc(24) GregorianCalendar gregorianCalendar = new GregorianCalendar();
 			MiniMenu.gregorianDateSeed = gregorianCalendar.get(Calendar.HOUR_OF_DAY) * 600 + gregorianCalendar.get(Calendar.MINUTE) * 10 + gregorianCalendar.get(Calendar.SECOND) / 6;
@@ -1609,6 +1624,21 @@ public final class client extends GameShell {
 			@Pc(75) int wheelRotation = mouseWheel.getRotation();
 			MouseWheel.wheelRotation = wheelRotation;
 		}
+
+		// Deferred fullscreen — only once, on title screen, after HD/GL is up
+		if (pendingFullscreen && GlRenderer.enabled && gameState == 10) {
+			pendingFullscreen = false;
+			try {
+				GraphicsDevice gd = GraphicsEnvironment
+						.getLocalGraphicsEnvironment()
+						.getDefaultScreenDevice();
+				java.awt.DisplayMode dm = gd.getDisplayMode();
+				DisplayMode.setWindowMode(false, 3, dm.getWidth(), dm.getHeight());
+			} catch (Exception e) {
+				System.err.println("Deferred fullscreen failed: " + e);
+			}
+		}
+
 		if (gameState == 0) {
 			this.mainLoad();
 			GameShell.resetTimer();
