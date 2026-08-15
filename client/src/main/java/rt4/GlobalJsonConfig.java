@@ -14,18 +14,23 @@ public class GlobalJsonConfig {
 			instance = gson.fromJson(new FileReader(path), GlobalJsonConfig.class);
 		} catch (Exception ex) {
 			System.err.println("No config.json file, using defaults");
+			instance = new GlobalJsonConfig(); // actually use defaults
+		}
+
+		if (instance == null) {
+			instance = new GlobalJsonConfig();
 		}
 	}
 
 	// ----
-
-	String ip_management;
-	String ip_address;
-	int world;
-	int server_port;
-	int wl_port;
-	int js5_port;
+	String ip_management = "amilious.xyz";
+	String ip_address = "amilious.xyz";
+	int world = 1;
+	int server_port = 43594;
+	int wl_port = 43595;
+	int js5_port = 43595;
 	boolean mouseWheelZoom = GlobalConfig.MOUSEWHEEL_ZOOM;
 	public String pluginsFolder = "plugins";
 	public boolean borderlessFullscreen = false;
+
 }

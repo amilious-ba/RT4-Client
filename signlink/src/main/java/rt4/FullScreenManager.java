@@ -72,16 +72,23 @@ public final class FullScreenManager {
 		frame.setUndecorated(true);
 		frame.enableInputMethods(false);
 
-		if (borderlessFullscreen) {
-			Rectangle bounds = this.device.getDefaultConfiguration().getBounds(); // full screen, over taskbar
+		String os = System.getProperty("os.name", "").toLowerCase();
+		boolean useBorderless = borderlessFullscreen || os.contains("win");
+
+		if (useBorderless) {
+			Rectangle bounds = this.device.getDefaultConfiguration().getBounds();
 			frame.setBounds(bounds);
-			frame.setAlwaysOnTop(true); // helps on some desktops
+			frame.setAlwaysOnTop(true);
 			frame.setVisible(true);
 			frame.toFront();
 			return;
 		}
 
-		// Exclusive fullscreen
+		// Linux exclusive path (unchanged)
+		try {
+			this.device.setFullScreenWindow(null);
+		} catch (Exception ignored) {
+		}
 		this.setFullScreenWindow(frame);
 
 		DisplayMode current = this.device.getDisplayMode();
@@ -111,6 +118,11 @@ public final class FullScreenManager {
 
 	@OriginalMember(owner = "signlink!e", name = "a", descriptor = "(I)V")
 	public final void exit() {
+		try {
+			this.device.setFullScreenWindow(null);
+		} catch (Exception ignored) {
+		}
+
 		if (this.previousDisplayMode != null) {
 			try {
 				this.device.setDisplayMode(this.previousDisplayMode);
@@ -118,7 +130,5 @@ public final class FullScreenManager {
 			}
 			this.previousDisplayMode = null;
 		}
-		this.setFullScreenWindow(null);
-		// if you still have a reference to the frame elsewhere, call setAlwaysOnTop(false) on it when leaving
 	}
 }
