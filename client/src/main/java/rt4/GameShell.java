@@ -680,7 +680,7 @@ public abstract class GameShell extends Applet implements Runnable, FocusListene
 			topMargin = 0;
 			instance = this;
 			frame = new Frame();
-			frame.setTitle("Jagex");
+			frame.setTitle("Amilious");
 			frame.setResizable(true);
 			frame.addWindowListener(this);
 			frame.setVisible(true);

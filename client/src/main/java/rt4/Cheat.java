@@ -99,6 +99,7 @@ public class Cheat {
 	@OriginalMember(owner = "client!jg", name = "e", descriptor = "Z")
 	public static boolean qaOpTest = false;
 	public static final JagString RELOADPLUGINS = JagString.parse("::reloadplugins");
+	public static final JagString BORDERLESS = JagString.parse("::borderless");
 
 	@OriginalMember(owner = "client!en", name = "a", descriptor = "(IIIB)V")
 	public static void teleport(@OriginalArg(0) int arg0, @OriginalArg(1) int arg1, @OriginalArg(2) int arg2) {
@@ -233,6 +234,15 @@ public class Cheat {
 			}
 		if (arg0.equalsIgnoreCase(RELOADPLUGINS)) {
 			PluginRepository.reloadPlugins();
+		}
+		if (arg0.equalsIgnoreCase(BORDERLESS)) {
+			FullScreenManager.borderlessFullscreen = !FullScreenManager.borderlessFullscreen;
+			if (GlobalJsonConfig.instance != null) {
+				GlobalJsonConfig.instance.borderlessFullscreen = FullScreenManager.borderlessFullscreen;
+			}
+			Chat.add(null, 0, JagString.parse("Borderless fullscreen: " +
+					(FullScreenManager.borderlessFullscreen ? "ON" : "OFF")));
+			return;
 		}
 		//}
 		sendCheatPacket(arg0);

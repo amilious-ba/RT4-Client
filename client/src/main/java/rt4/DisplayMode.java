@@ -276,27 +276,27 @@ public final class DisplayMode {
 
 	@OriginalMember(owner = "client!pm", name = "a", descriptor = "(ILsignlink!ll;)[Lclient!od;")
 	public static DisplayMode[] method3558(@OriginalArg(1) SignLink arg0) {
-		if (!arg0.isFullScreenSupported()) {
+		try {
+			GraphicsDevice gd = GraphicsEnvironment
+					.getLocalGraphicsEnvironment()
+					.getDefaultScreenDevice();
+
+			java.awt.DisplayMode[] awtModes = gd.getDisplayModes();
+			DisplayMode[] result = new DisplayMode[awtModes.length];
+
+			for (int i = 0; i < awtModes.length; i++) {
+				DisplayMode m = new DisplayMode();
+				m.width = awtModes[i].getWidth();
+				m.height = awtModes[i].getHeight();
+				m.bitDepth = awtModes[i].getBitDepth();
+				m.refreshRate = awtModes[i].getRefreshRate();
+				result[i] = m;
+			}
+			return result;
+		} catch (Exception e) {
+			System.err.println("Failed to get display modes: " + e);
 			return new DisplayMode[0];
 		}
-		@Pc(17) PrivilegedRequest local17 = arg0.getDisplayModes();
-		while (local17.status == 0) {
-			ThreadUtils.sleep(10L);
-		}
-		if (local17.status == 2) {
-			return new DisplayMode[0];
-		}
-		@Pc(39) int[] local39 = (int[]) local17.result;
-		@Pc(45) DisplayMode[] local45 = new DisplayMode[local39.length >> 2];
-		for (@Pc(47) int local47 = 0; local47 < local45.length; local47++) {
-			@Pc(59) DisplayMode local59 = new DisplayMode();
-			local45[local47] = local59;
-			local59.width = local39[local47 << 2];
-			local59.height = local39[(local47 << 2) + 1];
-			local59.bitDepth = local39[(local47 << 2) + 2];
-			local59.refreshRate = local39[(local47 << 2) + 3];
-		}
-		return local45;
 	}
 
 	@OriginalMember(owner = "client!nf", name = "a", descriptor = "(IIIIILsignlink!ll;)Ljava/awt/Frame;")

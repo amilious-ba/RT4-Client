@@ -218,6 +218,9 @@ public final class client extends GameShell {
 	public static void main(@OriginalArg(0) String[] arg0) {
 		try {
 			GlobalJsonConfig.load(GlobalConfig.EXTENDED_CONFIG_PATH);
+			if (GlobalJsonConfig.instance != null) {
+				FullScreenManager.borderlessFullscreen = GlobalJsonConfig.instance.borderlessFullscreen;
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

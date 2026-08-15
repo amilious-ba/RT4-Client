@@ -11,6 +11,8 @@ import java.lang.reflect.Field;
 @OriginalClass("signlink!e")
 public final class FullScreenManager {
 
+	public static boolean borderlessFullscreen = false;
+
 	@OriginalMember(owner = "signlink!e", name = "b", descriptor = "Ljava/awt/DisplayMode;")
 	private DisplayMode previousDisplayMode;
 
@@ -66,27 +68,32 @@ public final class FullScreenManager {
 		if (this.previousDisplayMode == null) {
 			throw new NullPointerException();
 		}
+
 		frame.setUndecorated(true);
 		frame.enableInputMethods(false);
+
+		if (borderlessFullscreen) {
+			Rectangle bounds = this.device.getDefaultConfiguration().getBounds(); // full screen, over taskbar
+			frame.setBounds(bounds);
+			frame.setAlwaysOnTop(true); // helps on some desktops
+			frame.setVisible(true);
+			frame.toFront();
+			return;
+		}
+
+		// Exclusive fullscreen
 		this.setFullScreenWindow(frame);
-		if (refreshRate == 0) {
-			@Pc(37) int previousRefreshRate = this.previousDisplayMode.getRefreshRate();
-			@Pc(41) DisplayMode[] displayModes = this.device.getDisplayModes();
-			@Pc(43) boolean foundMode = false;
-			for (@Pc(45) int i = 0; i < displayModes.length; i++) {
-				if (displayModes[i].getWidth() == width && displayModes[i].getHeight() == height && bitDepth == displayModes[i].getBitDepth()) {
-					@Pc(77) int r = displayModes[i].getRefreshRate();
-					if (!foundMode || Math.abs(r - previousRefreshRate) < Math.abs(refreshRate - previousRefreshRate)) {
-						foundMode = true;
-						refreshRate = r;
-					}
-				}
-			}
-			if (!foundMode) {
-				refreshRate = previousRefreshRate;
+
+		DisplayMode current = this.device.getDisplayMode();
+		if (current.getWidth() != width || current.getHeight() != height) {
+			try {
+				int rate = (refreshRate > 0) ? refreshRate : current.getRefreshRate();
+				int depth = (bitDepth > 0) ? bitDepth : current.getBitDepth();
+				this.device.setDisplayMode(new DisplayMode(width, height, depth, rate));
+			} catch (Exception e) {
+				System.err.println("Failed to set display mode " + width + "x" + height + ": " + e);
 			}
 		}
-		this.device.setDisplayMode(new DisplayMode(width, height, bitDepth, refreshRate));
 	}
 
 	@OriginalMember(owner = "signlink!e", name = "a", descriptor = "(Z)[I")
@@ -105,12 +112,13 @@ public final class FullScreenManager {
 	@OriginalMember(owner = "signlink!e", name = "a", descriptor = "(I)V")
 	public final void exit() {
 		if (this.previousDisplayMode != null) {
-			this.device.setDisplayMode(this.previousDisplayMode);
-			if (!this.device.getDisplayMode().equals(this.previousDisplayMode)) {
-				throw new RuntimeException("Did not return to correct resolution!");
+			try {
+				this.device.setDisplayMode(this.previousDisplayMode);
+			} catch (Exception ignored) {
 			}
 			this.previousDisplayMode = null;
 		}
 		this.setFullScreenWindow(null);
+		// if you still have a reference to the frame elsewhere, call setAlwaysOnTop(false) on it when leaving
 	}
 }

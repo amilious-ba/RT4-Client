@@ -27,4 +27,5 @@ public class GlobalJsonConfig {
 	int js5_port;
 	boolean mouseWheelZoom = GlobalConfig.MOUSEWHEEL_ZOOM;
 	public String pluginsFolder = "plugins";
+	public boolean borderlessFullscreen = false;
 }
