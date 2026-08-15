@@ -1030,6 +1030,7 @@ public final class client extends GameShell {
 			//Cheat.displayFps = true;
 		}
 		PluginRepository.Init();
+		rt4.amilious.AmiliousClient.init();
 	}
 
 	@OriginalMember(owner = "client!client", name = "c", descriptor = "(I)V")
@@ -1617,6 +1618,10 @@ public final class client extends GameShell {
 		audioLoop();
 		Keyboard.loop();
 		Mouse.loop();
+
+		//add for amilious client
+		rt4.amilious.AmiliousClient.update();
+
 		if (GlRenderer.enabled) {
 			GlCleaner.process();
 		}

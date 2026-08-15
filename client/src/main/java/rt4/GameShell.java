@@ -352,6 +352,10 @@ public abstract class GameShell extends Applet implements Runnable, FocusListene
 		focus = true;
 		replaceCanvas = false;
 		lastCanvasReplace = MonotonicClock.currentTimeMillis();
+
+		//added for modifications
+		rt4.amilious.AmiliousClient.onCanvas();
+
 	}
 
 	@OriginalMember(owner = "client!rc", name = "destroy", descriptor = "()V")

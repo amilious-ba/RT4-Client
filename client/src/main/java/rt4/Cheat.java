@@ -235,6 +235,9 @@ public class Cheat {
 		if (arg0.equalsIgnoreCase(RELOADPLUGINS)) {
 			PluginRepository.reloadPlugins();
 		}
+
+		//added for amilious client
+		if (rt4.amilious.AmiliousClient.handleCheat(arg0)) {return;	}
 		if (arg0.equalsIgnoreCase(BORDERLESS)) {
 			FullScreenManager.borderlessFullscreen = !FullScreenManager.borderlessFullscreen;
 			if (GlobalJsonConfig.instance != null) {
@@ -244,7 +247,7 @@ public class Cheat {
 					(FullScreenManager.borderlessFullscreen ? "ON" : "OFF")));
 			return;
 		}
-		//}
+
 		sendCheatPacket(arg0);
 	}
 
