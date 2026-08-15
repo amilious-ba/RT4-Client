@@ -33,6 +33,13 @@ public final class InputController {
                         TabCycle.next();
                     }
                     break;
+                case KeyEvent.VK_F12:
+                    Tab current = TabCycle.lastSelected();
+                    if (current == null) {
+                        current = Tab.COMBAT; // or skip
+                    }
+                    current.select();
+                    break;
                 case KeyEvent.VK_INSERT:
                     MapController.toggle();
                     break;
